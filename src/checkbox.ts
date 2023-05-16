@@ -1,10 +1,26 @@
+/* Custom Checkbox with customizable label
+  @Props - {value: boolean} state of checkbox 
+  @Attrb - {name: string} used for label and input name, {value: boolean} state of checkbox, {color: string} checkbox label color
+  @Events - 'value-changed' event fired on checkbox update
+*/
 class Checkbox extends HTMLElement {
   private inputEl: HTMLInputElement;
   private labelEl: HTMLLabelElement;
 
-  value = false;
+  private _value = false;
 
-  attributUpdater: { [key: string]: (newValue: string) => void } = {
+  public set value(v: boolean) {
+    this._value = v;
+    if (this.inputEl) {
+      this.inputEl.checked = v;
+    }
+  }
+
+  public get value() {
+    return this._value;
+  }
+
+  private attributeUpdater: { [key: string]: (newValue: string) => void } = {
     name: (newValue: string) => {
       this.inputEl.setAttribute("name", newValue);
       this.labelEl.textContent = newValue;
@@ -14,7 +30,6 @@ class Checkbox extends HTMLElement {
     },
     value: (newValue: string) => {
       this.value = newValue ? newValue === "true" : false;
-      this.inputEl.checked = this.value;
     },
   };
 
@@ -29,60 +44,58 @@ class Checkbox extends HTMLElement {
 
     shadow.innerHTML = `
       <style>
-
       .checkbox {
         margin-block: 0.4em;
       }
 
       [type="checkbox"]:not(:checked),
       [type="checkbox"]:checked {
-      position: absolute;
-      opacity: 0;
-    }
-    [type="checkbox"]:not(:checked) + label,
-    [type="checkbox"]:checked + label {
-      position: relative;
-      padding-left: 1.5em;
-      cursor: pointer;
-    }
+        position: absolute;
+        opacity: 0;
+      }
 
-    /* checkbox aspect */
-    [type="checkbox"]:not(:checked) + label:before,
+      [type="checkbox"]:not(:checked) + label,
+      [type="checkbox"]:checked + label {
+        position: relative;
+        padding-left: 1.5em;
+        cursor: pointer;
+      }
+
+      [type="checkbox"]:not(:checked) + label:before,
+      [type="checkbox"]:checked + label:before {
+        content: '';
+        position: absolute;
+        left: 0 ;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1em;
+        height: 1em;
+        outline: 0.3px solid gray;
+        border-radius: .2em;
+      }
+
+      [type="checkbox"]:not(:checked) + label:after,
+      [type="checkbox"]:checked + label:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0;
+        background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxNCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjI4NDkxIDcuNzIxMDFMMTIuMTA3MiAwLjc5NDk5MUMxMi4zNzY0IDAuNTIxNzY3IDEyLjgxMjcgMC41MjE3NjcgMTMuMDgxOSAwLjc5NDk5MUMxMy4zNTEgMS4wNjgyMSAxMy4zNTEgMS41MTEyIDEzLjA4MTkgMS43ODQ0Mkw1Ljc3MjIyIDkuMjA1MTZDNS41MDMwOCA5LjQ3ODM4IDUuMDY2NzMgOS40NzgzOCA0Ljc5NzYgOS4yMDUxNkwwLjg5OTExNiA1LjI0NzQzQzAuNjI5OTgyIDQuOTc0MjEgMC42Mjk5ODIgNC41MzEyMiAwLjg5OTExNiA0LjI1OEMxLjE2ODI1IDMuOTg0NzggMS42MDQ2IDMuOTg0NzggMS44NzM3NCA0LjI1OEw1LjI4NDkxIDcuNzIxMDFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K") no-repeat center;
+        background-size: 70%;
+        border-radius: .2em;
+        width: 1em;
+        height: 1em;
+      }
+
+      [type="checkbox"]:not(:checked) + label:after {
+        opacity: 0;
+      }
+
     [type="checkbox"]:checked + label:before {
-      content: '';
-      position: absolute;
-      left: 0 ;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 1em;
-      height: 1em;
-      outline: 0.3px solid gray;
-      border-radius: .2em;
-    }
-
-    [type="checkbox"]:not(:checked) + label:after,
-    [type="checkbox"]:checked + label:after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      left: 0;
-      background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxNCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjI4NDkxIDcuNzIxMDFMMTIuMTA3MiAwLjc5NDk5MUMxMi4zNzY0IDAuNTIxNzY3IDEyLjgxMjcgMC41MjE3NjcgMTMuMDgxOSAwLjc5NDk5MUMxMy4zNTEgMS4wNjgyMSAxMy4zNTEgMS41MTEyIDEzLjA4MTkgMS43ODQ0Mkw1Ljc3MjIyIDkuMjA1MTZDNS41MDMwOCA5LjQ3ODM4IDUuMDY2NzMgOS40NzgzOCA0Ljc5NzYgOS4yMDUxNkwwLjg5OTExNiA1LjI0NzQzQzAuNjI5OTgyIDQuOTc0MjEgMC42Mjk5ODIgNC41MzEyMiAwLjg5OTExNiA0LjI1OEMxLjE2ODI1IDMuOTg0NzggMS42MDQ2IDMuOTg0NzggMS44NzM3NCA0LjI1OEw1LjI4NDkxIDcuNzIxMDFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K") no-repeat center;
-      background-size: 70%;
-      border-radius: .2em;
-      width: 1em;
-      height: 1em;
-    }
-
-    /* checked mark aspect changes */
-    [type="checkbox"]:not(:checked) + label:after {
-      opacity: 0;
-    }
-
-  [type="checkbox"]:checked + label:before {
-      background: linear-gradient(rgb(62, 174, 255) -4.13%, rgb(60, 244, 200) 97.72%);
-      outline: unset;
-    }
+        background: linear-gradient(rgb(62, 174, 255) -4.13%, rgb(60, 244, 200) 97.72%);
+        outline: unset;
+      }
 
       </style>
     `;
@@ -104,7 +117,7 @@ class Checkbox extends HTMLElement {
     this.inputEl.setAttribute("id", id);
     this.inputEl.checked = this.value;
 
-    this.inputEl.addEventListener("change", (e: Event) => {
+    this.inputEl.addEventListener("change", () => {
       this.value = this.inputEl.checked;
       this.dispatchEvent(
         new CustomEvent("value-changed", {
@@ -128,7 +141,7 @@ class Checkbox extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    const updater = this.attributUpdater[name];
+    const updater = this.attributeUpdater[name];
     updater ? updater(newValue) : null;
   }
 }

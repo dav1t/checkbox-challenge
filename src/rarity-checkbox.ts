@@ -1,5 +1,8 @@
 import "./checkbox";
 
+/*
+ @Events - 'value-changed' Event fired on when any checkbox in the list is changed
+*/
 class RarityCheckbox extends HTMLElement {
   value: Record<string, boolean> = {};
 
